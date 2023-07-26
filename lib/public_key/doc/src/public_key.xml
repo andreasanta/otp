@@ -12,7 +12,7 @@
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
- 
+
       http://www.apache.org/licenses/LICENSE-2.0
 
   Unless required by applicable law or agreed to in writing, software
@@ -41,18 +41,18 @@
   </description>
 
   <section>
-    <title>Common Records and ASN.1 Types</title> 
-    
-    <note><p>All records used in this Reference Manual 
+    <title>Common Records and ASN.1 Types</title>
+
+    <note><p>All records used in this Reference Manual
     <!--     except #policy_tree_node{}  -->
     are generated from ASN.1 specifications
-    and are documented in the User's Guide. See <seeguide 
+    and are documented in the User's Guide. See <seeguide
     marker="public_key_records">Public-key Records</seeguide>.
     </p></note>
-    
-    <p>Use the following include directive to get access to the 
+
+    <p>Use the following include directive to get access to the
     records and constant macros described here and in the User's Guide:</p>
-    
+
     <code> -include_lib("public_key/include/public_key.hrl").</code>
   </section>
 
@@ -268,7 +268,7 @@
   </datatypes>
 
 
-<funcs>    
+<funcs>
 
   <func>
     <name name="cacerts_clear" arity="0" since="OTP 25.0"/>
@@ -327,36 +327,36 @@
     <name name="decrypt_private" arity="2" since="OTP R14B"/>
     <name name="decrypt_private" arity="3" since="OTP R14B"/>
     <fsummary>Public-key decryption.</fsummary>
-  <desc> 
+  <desc>
     <p>Public-key decryption using the private key. See also <seemfa
-	marker="crypto:crypto#private_decrypt/4">crypto:private_decrypt/4</seemfa></p> 
-  </desc> 
+	marker="crypto:crypto#private_decrypt/4">crypto:private_decrypt/4</seemfa></p>
+  </desc>
   </func>
 
   <func>
     <name name="decrypt_public" arity="2" since="OTP R14B"/>
     <name name="decrypt_public" arity="3" since="OTP R14B"/>
     <fsummary>Public-key decryption.</fsummary>
-  <desc> 
+  <desc>
     <p>Public-key decryption using the public key. See also <seemfa
-	marker="crypto:crypto#public_decrypt/4">crypto:public_decrypt/4</seemfa></p> 
-  </desc> 
-  </func> 
+	marker="crypto:crypto#public_decrypt/4">crypto:public_decrypt/4</seemfa></p>
+  </desc>
+  </func>
 
   <func>
     <name name="der_decode" arity="2" since="OTP R14B"/>
     <fsummary>Decodes a public-key ASN.1 DER encoded entity.</fsummary>
     <desc>
       <p>Decodes a public-key ASN.1 DER encoded entity.</p>
-    </desc> 
+    </desc>
   </func>
 
   <func>
     <name name="der_encode" arity="2" since="OTP R14B"/>
     <fsummary>Encodes a public-key entity with ASN.1 DER encoding.</fsummary>
-  <desc> 
+  <desc>
     <p>Encodes a public-key entity with ASN.1 DER encoding.</p>
-  </desc> 
+  </desc>
   </func>
 
   <func>
@@ -375,7 +375,7 @@
 	$> generate
          ---- wait until all background jobs has finished. It may take several days !
 	$> cat moduli-* > moduli
-	$> cd ..; make 
+	$> cd ..; make
       </pre>
     </desc>
   </func>
@@ -384,23 +384,23 @@
     <name name="encrypt_private" arity="2" since="OTP R14B"/>
     <name name="encrypt_private" arity="3" since="OTP 21.1"/>
     <fsummary>Public-key encryption using the private key.</fsummary>
-  <desc> 
+  <desc>
     <p>Public-key encryption using the private key.
      See also <seemfa
-	marker="crypto:crypto#private_encrypt/4">crypto:private_encrypt/4</seemfa>.</p> 
-  </desc> 
-  </func>   
+	marker="crypto:crypto#private_encrypt/4">crypto:private_encrypt/4</seemfa>.</p>
+  </desc>
+  </func>
 
   <func>
     <name name="encrypt_public" arity="2" since="OTP R14B"/>
     <name name="encrypt_public" arity="3" since="OTP 21.1"/>
     <fsummary>Public-key encryption using the public key.</fsummary>
-  <desc> 
+  <desc>
     <p>Public-key encryption using the public key. See also <seemfa
-	marker="crypto:crypto#public_encrypt/4">crypto:public_encrypt/4</seemfa>.</p> 
-  </desc> 
-  </func>   
-  
+	marker="crypto:crypto#public_encrypt/4">crypto:public_encrypt/4</seemfa>.</p>
+  </desc>
+  </func>
+
   <func>
     <name name="generate_key" arity="1" since="OTP R16B01"/>
     <fsummary>Generates a new key pair.</fsummary>
@@ -416,70 +416,70 @@
     <name name="pem_decode" arity="1" since="OTP R14B"/>
     <fsummary>Decodes PEM binary data and returns
     entries as ASN.1 DER encoded entities.</fsummary>
-  <desc> 
+  <desc>
     <p>Decodes PEM binary data and returns entries as ASN.1 DER encoded entities.</p>
     <p>Example <c>{ok, PemBin} = file:read_file("cert.pem").
-    PemEntries = public_key:pem_decode(PemBin).    
+    PemEntries = public_key:pem_decode(PemBin).
     </c></p>
-  </desc> 
-  </func> 
-    
+  </desc>
+  </func>
+
   <func>
     <name name="pem_encode" arity="1" since="OTP R14B"/>
     <fsummary>Creates a PEM binary.</fsummary>
-    <desc> 
-      <p>Creates a PEM binary.</p> 
-    </desc> 
+    <desc>
+      <p>Creates a PEM binary.</p>
+    </desc>
   </func>
 
   <func>
     <name name="pem_entry_decode" arity="1" since="OTP R14B"/>
     <name name="pem_entry_decode" arity="2" since="OTP R14B"/>
     <fsummary>Decodes a PEM entry.</fsummary>
-  <desc> 
+  <desc>
     <p>Decodes a PEM entry. <c>pem_decode/1</c> returns a list of PEM
     entries. Notice that if the PEM entry is of type
     'SubjectPublickeyInfo', it is further decoded to an
     <c>rsa_public_key()</c> or <c>dsa_public_key()</c>.</p>
     <p>Password can be either an octet string or function which returns same type.</p>
-  </desc> 
+  </desc>
   </func>
 
   <func>
     <name name="pem_entry_encode" arity="2" since="OTP R14B"/>
     <name name="pem_entry_encode" arity="3" since="OTP R14B"/>
     <fsummary>Creates a PEM entry that can be fed to <c>pem_encode/1</c>.</fsummary>
-    <desc> 
+    <desc>
       <p>Creates a PEM entry that can be feed to <c>pem_encode/1</c>.</p>
       <p>If <c>Asn1Type</c> is <c>'SubjectPublicKeyInfo'</c>,
-      <c>Entity</c> must be either an <c>rsa_public_key()</c>, 
+      <c>Entity</c> must be either an <c>rsa_public_key()</c>,
       <c>dsa_public_key()</c> or an <c>ec_public_key()</c>
       and this function creates the appropriate
       <c>'SubjectPublicKeyInfo'</c> entry.
       </p>
-    </desc> 
+    </desc>
   </func>
 
   <func>
     <name name="pkix_decode_cert" arity="2" since=""/>
     <fsummary>Decodes an ASN.1 DER-encoded PKIX x509 certificate.</fsummary>
-    <desc> 
+    <desc>
       <p>Decodes an ASN.1 DER-encoded PKIX certificate. Option <c>otp</c>
       uses the customized ASN.1 specification OTP-PKIX.asn1 for
       decoding and also recursively decode most of the standard
       parts.</p>
-    </desc> 
+    </desc>
   </func>
 
   <func>
     <name name="pkix_encode" arity="3" since="OTP R14B"/>
     <fsummary>DER encodes a PKIX x509 certificate or part of such a
     certificate.</fsummary>
-  <desc> 
+  <desc>
     <p>DER encodes a PKIX x509 certificate or part of such a
     certificate. This function must be used for encoding certificates or parts of certificates
     that are decoded/created in the <c>otp</c> format, whereas for the plain format this
-    function directly calls <c>der_encode/2</c>.</p> 
+    function directly calls <c>der_encode/2</c>.</p>
 
     <note><p>Subtle ASN-1 encoding errors in certificates may be worked around when decoding, this may have the affect that
     the encoding a certificate back to DER may generate different bytes then the supplied original.</p></note>
@@ -490,43 +490,43 @@
  <func>
    <name name="pkix_is_issuer" arity="2" since="OTP R14B"/>
    <fsummary>Checks if <c>IssuerCert</c> issued <c>Cert</c>.</fsummary>
-   <desc> 
-     <p>Checks if <c>IssuerCert</c> issued <c>Cert</c>.</p> 
-   </desc> 
+   <desc>
+     <p>Checks if <c>IssuerCert</c> issued <c>Cert</c>.</p>
+   </desc>
  </func>
-  
+
  <func>
    <name name="pkix_is_fixed_dh_cert" arity="1" since="OTP R14B"/>
    <fsummary>Checks if a certificate is a fixed Diffie-Hellman certificate.</fsummary>
-   <desc> 
-     <p>Checks if a certificate is a fixed Diffie-Hellman certificate.</p> 
-   </desc> 
- </func>  
-  
+   <desc>
+     <p>Checks if a certificate is a fixed Diffie-Hellman certificate.</p>
+   </desc>
+ </func>
+
  <func>
    <name name="pkix_is_self_signed" arity="1" since="OTP R14B"/>
    <fsummary>Checks if a certificate is self-signed.</fsummary>
-   <desc> 
-     <p>Checks if a certificate is self-signed.</p> 
-   </desc> 
+   <desc>
+     <p>Checks if a certificate is self-signed.</p>
+   </desc>
  </func>
 
  <func>
    <name name="pkix_issuer_id" arity="2" since="OTP R14B"/>
    <fsummary>Returns the x509 certificate issuer id.</fsummary>
-   <desc> 
+   <desc>
      <p>Returns the x509 certificate issuer id, if it can be determined.</p>
-   </desc> 
+   </desc>
  </func>
- 
+
  <func>
    <name name="pkix_normalize_name" arity="1" since="OTP R14B"/>
    <fsummary>Normalizes an issuer name so that it can be easily
    compared to another issuer name.</fsummary>
-   <desc> 
+   <desc>
      <p>Normalizes an issuer name so that it can be easily
-     compared to another issuer name.</p> 
-   </desc> 
+     compared to another issuer name.</p>
+   </desc>
  </func>
 
   <func>
@@ -609,6 +609,9 @@ fun(OtpCert :: #'OTPCertificate'{},
 	<tag>{revoked, crl_reason()}</tag>
 	<item><p>Certificate has been revoked.</p></item>
 
+  <tag>invalid_validity_dates</tag>
+  <item><p>The validity section of the X.509 certificate(s) contains invalid date formats not matching the RFC.</p></item>
+
 	<tag>atom()</tag>
 	<item><p>Application-specific error reason that is to be checked by the <c>verify_fun</c>.</p></item>
       </taglist>
@@ -616,14 +619,14 @@ fun(OtpCert :: #'OTPCertificate'{},
     </desc>
    </func>
 
-    <func>  
+    <func>
       <name name="pkix_crl_issuer" arity="1" since="OTP 17.5"/>
       <fsummary>Returns the issuer of the <c>CRL</c>.</fsummary>
-      <desc> 
+      <desc>
 	<p>Returns the issuer of the <c>CRL</c>.</p>
-      </desc> 
-    </func> 
-   
+      </desc>
+    </func>
+
    <func>
      <name name="pkix_crls_validate" arity="3" since="OTP R16B"/>
      <fsummary>Performs CRL validation.</fsummary>
@@ -635,7 +638,7 @@ fun(OtpCert :: #'OTPCertificate'{},
        <p>Available options:</p>
 
       <taglist>
-	
+
 	<tag>{update_crl, fun()}</tag>
 	<item>
 	  <p>The fun has the following type specification:</p>
@@ -653,14 +656,14 @@ fun(OtpCert :: #'OTPCertificate'{},
 	<tag>{issuer_fun, fun()}</tag>
 	<item>
 	  <p>The fun has the following type specification:</p>
-	  
+
 	  <code>
 fun(#'DistributionPoint'{}, #'CertificateList'{},
     {rdnSequence,[#'AttributeTypeAndValue'{}]}, term()) ->
 	{ok, #'OTPCertificate'{}, [der_encoded]}</code>
 
 	  <p>The fun returns the root certificate and certificate chain
-	  that has signed the CRL. 
+	  that has signed the CRL.
 	  </p>
 	  <code> fun(DP, CRL, Issuer, UserState) -> {ok, RootCert, CertChain}</code>
 	</item>
@@ -675,41 +678,41 @@ fun(#'DistributionPoint'{}, #'CertificateList'{},
       </taglist>
     </desc>
    </func>
-   
-   <func>  
+
+   <func>
      <name name="pkix_crl_verify" arity="2" since="OTP 17.5"/>
      <fsummary> Verify that  <c>Cert</c>  is the <c> CRL</c>  signer. </fsummary>
-     <desc> 
+     <desc>
        <p>Verify that <c>Cert</c> is the <c>CRL</c> signer.</p>
-     </desc> 
+     </desc>
    </func>
 
-   <func>  
+   <func>
      <name name="pkix_dist_point" arity="1" since="OTP 17.5"/>
      <fsummary>Creates a distribution point for CRLs issued by the same issuer as <c>Cert</c>.</fsummary>
-     <desc> 
+     <desc>
        <p>Creates a distribution point for CRLs issued by the same issuer as <c>Cert</c>.
        Can be used as input to <seemfa
        marker="#pkix_crls_validate/3">pkix_crls_validate/3 </seemfa>
        </p>
-     </desc> 
+     </desc>
    </func>
-   
-   <func>  
+
+   <func>
      <name name="pkix_dist_points" arity="1" since="OTP 17.5"/>
      <fsummary> Extracts distribution points from the certificates extensions.</fsummary>
-     <desc> 
+     <desc>
        <p> Extracts distribution points from the certificates extensions.</p>
-     </desc> 
+     </desc>
  </func>
 
  <func>
     <name name="pkix_hash_type" arity="1" since="OTP 23.0"/>
     <fsummary>Translates OID to Erlang digest type</fsummary>
-    <desc> 
-      <p>Translates OID to Erlang digest type</p> 
-    </desc> 
-  </func> 
+    <desc>
+      <p>Translates OID to Erlang digest type</p>
+    </desc>
+  </func>
 
   <func>
     <name name="pkix_match_dist_point" arity="2" since="OTP 19.0"/>
@@ -726,11 +729,11 @@ fun(#'DistributionPoint'{}, #'CertificateList'{},
   <func>
     <name name="pkix_sign" arity="2" since="OTP R14B"/>
     <fsummary>Signs certificate.</fsummary>
-    <desc> 
+    <desc>
       <p>Signs an 'OTPTBSCertificate'. Returns the corresponding
-      DER-encoded certificate.</p> 
-    </desc> 
-  </func> 
+      DER-encoded certificate.</p>
+    </desc>
+  </func>
 
   <func>
     <name name="pkix_sign_types" arity="1" since="OTP R16B01"/>
@@ -803,7 +806,7 @@ fun(#'DistributionPoint'{}, #'CertificateList'{},
 	<item><p>The validity period of the certificate.</p></item>
 	<tag> {extensions, [#'Extension'{}]}</tag>
 	<item><p> Extensions to include in the certificate.</p>
-	      
+
 	  <p>Default extensions included in CA certificates if not
 	  otherwise specified are: </p>
 	  <code>[#'Extension'{extnID = ?'id-ce-keyUsage',
@@ -828,14 +831,14 @@ fun(#'DistributionPoint'{}, #'CertificateList'{},
 	  </p></item>
 
 	</taglist>
-	  
+
 	<note><p>
-	Note that the generated certificates and keys does not provide a formally correct PKIX-trust-chain 
+	Note that the generated certificates and keys does not provide a formally correct PKIX-trust-chain
 	and they cannot be used to achieve real security. This function is provided for testing purposes only.
 </p></note>
     </desc>
   </func>
-  
+
   <func>
     <name name="pkix_test_root_cert" arity="2" since="OTP 20.2"/>
     <fsummary>Generates a test data root cert.</fsummary>
@@ -853,18 +856,18 @@ fun(#'DistributionPoint'{}, #'CertificateList'{},
   <func>
     <name name="pkix_subject_id" arity="1" since="OTP 23.1"/>
     <fsummary>Returns the X509 certificate subject id.</fsummary>
-    <desc> 
-      <p>Returns the X509 certificate subject id.</p> 
-    </desc> 
+    <desc>
+      <p>Returns the X509 certificate subject id.</p>
+    </desc>
   </func>
-  
-  <func>  
+
+  <func>
     <name name="pkix_verify" arity="2" since="OTP R14B"/>
     <fsummary>Verifies PKIX x.509 certificate signature.</fsummary>
-  <desc> 
+  <desc>
     <p>Verifies PKIX x.509 certificate signature.</p>
-  </desc> 
-  </func> 
+  </desc>
+  </func>
 
   <func>
     <name name="pkix_verify_hostname" arity="2"  since="OTP 19.3"/>
@@ -968,12 +971,12 @@ end
     <name name="sign" arity="4" since="OTP 20.1"/>
     <fsummary>Creates a digital signature.</fsummary>
   <desc>
-    <p>Creates a digital signature.</p> 
+    <p>Creates a digital signature.</p>
     <p>The <c>Msg</c> is either the binary "plain text" data to be
     signed or it is the hashed value of "plain text", that is, the
     digest.</p>
-  </desc> 
-  </func>   
+  </desc>
+  </func>
 
   <func>
     <name name="verify" arity="4" since="OTP R14B"/>
@@ -981,9 +984,9 @@ end
     <fsummary>Verifies a digital signature.</fsummary>
   <desc>
     <p>Verifies a digital signature.</p>
-    <p>The <c>Msg</c> is either the binary "plain text" data 
+    <p>The <c>Msg</c> is either the binary "plain text" data
     or it is the hashed value of "plain text", that is, the digest.</p>
-  </desc> 
+  </desc>
   </func>
 
   <func>

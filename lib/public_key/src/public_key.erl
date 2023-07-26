@@ -24,7 +24,7 @@
 
 -include("public_key.hrl").
 
--export([pem_decode/1, pem_encode/1, 
+-export([pem_decode/1, pem_encode/1,
 	 der_decode/2, der_encode/2,
 	 pem_entry_decode/1,
 	 pem_entry_decode/2,
@@ -32,8 +32,8 @@
 	 pem_entry_encode/3,
 	 pkix_decode_cert/2, pkix_encode/3,
 	 encrypt_private/2, encrypt_private/3,
-	 decrypt_private/2, decrypt_private/3, 
-	 encrypt_public/2, encrypt_public/3, 
+	 decrypt_private/2, decrypt_private/3,
+	 encrypt_public/2, encrypt_public/3,
 	 decrypt_public/2, decrypt_public/3,
 	 dh_gex_group/4,
 	 dh_gex_group_sizes/0,
@@ -43,7 +43,7 @@
 	 pkix_sign/2, pkix_verify/2,
 	 pkix_hash_type/1,
 	 pkix_sign_types/1,
-	 pkix_is_self_signed/1, 
+	 pkix_is_self_signed/1,
 	 pkix_is_fixed_dh_cert/1,
 	 pkix_is_issuer/2,
 	 pkix_issuer_id/2,
@@ -113,7 +113,7 @@
 -type public_key()           ::  rsa_public_key() | rsa_pss_public_key() | dsa_public_key() | ec_public_key() | ed_public_key() .
 -type private_key()          ::  rsa_private_key() | rsa_pss_private_key() | dsa_private_key() | ec_private_key() | ed_private_key() .
 -type rsa_public_key()       ::  #'RSAPublicKey'{}.
--type rsa_private_key()      ::  #'RSAPrivateKey'{}. 
+-type rsa_private_key()      ::  #'RSAPrivateKey'{}.
 -type dss_public_key()       :: integer().
 -type rsa_pss_public_key()   ::  {rsa_pss_public_key(), #'RSASSA-PSS-params'{}}.
 -type rsa_pss_private_key()  ::  { #'RSAPrivateKey'{}, #'RSASSA-PSS-params'{}}.
@@ -128,22 +128,22 @@
 -type ed_private_key()       :: #'ECPrivateKey'{parameters :: ed_params()}.
 -type ed_oid_name()            ::  'id-Ed25519' | 'id-Ed448'.
 -type ed_params()            ::  {namedCurve, ed_oid_name()}.
--type key_params()           :: #'DHParameter'{} | {namedCurve, oid()} | #'ECParameters'{} | 
-                                {rsa, Size::integer(), PubExp::integer()}. 
+-type key_params()           :: #'DHParameter'{} | {namedCurve, oid()} | #'ECParameters'{} |
+                                {rsa, Size::integer(), PubExp::integer()}.
 -type der_encoded()          :: binary().
 -type pki_asn1_type()        ::  'Certificate' | 'RSAPrivateKey' | 'RSAPublicKey'
 			       | 'SubjectPublicKeyInfo' | 'DSAPrivateKey'
                                | 'DHParameter' | 'PrivateKeyInfo' |
 				 'CertificationRequest' | 'ContentInfo' | 'CertificateList' |
 				 'ECPrivateKey' | 'OneAsymmetricKey'| 'EcpkParameters'.
--type pem_entry()            :: {pki_asn1_type(), 
+-type pem_entry()            :: {pki_asn1_type(),
 				 der_or_encrypted_der(),
 				 not_encrypted | cipher_info()
 				}.
 -type der_or_encrypted_der() :: binary().
 -type cipher_info()          :: {cipher(),
                                  cipher_info_params()} .
--type cipher()               :: string() . % "RC2-CBC" | "DES-CBC" | "DES-EDE3-CBC", 
+-type cipher()               :: string() . % "RC2-CBC" | "DES-CBC" | "DES-EDE3-CBC",
 -type cipher_info_params()   :: salt()
                               | {#'PBEParameter'{}, digest_type()}
                               | #'PBES2-params'{} .
@@ -160,7 +160,7 @@
 -type oid()                  :: tuple().
 -type cert_id()              :: {SerialNr::integer(), issuer_name()} .
 -type issuer_name()          :: {rdnSequence,[[#'AttributeTypeAndValue'{}]]} .
--type bad_cert_reason()      :: cert_expired | invalid_issuer | invalid_signature | name_not_permitted | missing_basic_constraint | invalid_key_usage | duplicate_cert_in_path | {revoked, crl_reason()} | atom().
+-type bad_cert_reason()      :: cert_expired | invalid_issuer | invalid_signature | name_not_permitted | missing_basic_constraint | invalid_key_usage | duplicate_cert_in_path | {revoked, crl_reason()} | invalid_validity_dates | atom().
 
 -type combined_cert()        :: #cert{}.
 -type cert()                 :: der_cert() | otp_cert().
@@ -192,7 +192,7 @@
 -spec pem_decode(binary()) -> [pem_entry()].
 %%
 %% Description: Decode PEM binary data and return
-%% entries as asn1 der encoded entities. 
+%% entries as asn1 der encoded entities.
 %%--------------------------------------------------------------------
 pem_decode(PemBin) when is_binary(PemBin) ->
     pubkey_pem:decode(PemBin).
@@ -237,18 +237,18 @@ pem_entry_decode(PemEntry, PasswordFun) when is_function(PasswordFun) ->
 pem_entry_decode({Asn1Type, Der, not_encrypted}, _) when is_atom(Asn1Type),
 							 is_binary(Der) ->
     der_decode(Asn1Type, Der);
-pem_entry_decode({Asn1Type, CryptDer, {Cipher, #'PBES2-params'{}}} = PemEntry, 
+pem_entry_decode({Asn1Type, CryptDer, {Cipher, #'PBES2-params'{}}} = PemEntry,
 		 Password) when is_atom(Asn1Type) andalso
 				is_binary(CryptDer) andalso
 				is_list(Cipher) ->
     do_pem_entry_decode(PemEntry, Password);
-pem_entry_decode({Asn1Type, CryptDer, {Cipher, {#'PBEParameter'{},_}}} = PemEntry, 
+pem_entry_decode({Asn1Type, CryptDer, {Cipher, {#'PBEParameter'{},_}}} = PemEntry,
  		 Password) when is_atom(Asn1Type) andalso
  				is_binary(CryptDer) andalso
  				is_list(Cipher) andalso
 				is_list(Password) ->
     do_pem_entry_decode(PemEntry, Password);
-pem_entry_decode({Asn1Type, CryptDer, {Cipher, Salt}} = PemEntry, 
+pem_entry_decode({Asn1Type, CryptDer, {Cipher, Salt}} = PemEntry,
 		 Password) when is_atom(Asn1Type) andalso
 				is_binary(CryptDer) andalso
 				is_list(Cipher) andalso
@@ -302,7 +302,7 @@ pem_entry_encode(Asn1Type, Entity)  when is_atom(Asn1Type) ->
                                                InfoPwd :: {CipherInfo,Password},
                                                CipherInfo :: cipher_info(),
                                                Password :: iodata() .
-pem_entry_encode(Asn1Type, Entity, {{Cipher, #'PBES2-params'{}} = CipherInfo, 
+pem_entry_encode(Asn1Type, Entity, {{Cipher, #'PBES2-params'{}} = CipherInfo,
 				    Password}) when is_atom(Asn1Type) andalso
 						    is_list(Password) andalso
 						    is_list(Cipher) ->
@@ -313,7 +313,7 @@ pem_entry_encode(Asn1Type, Entity, {{Cipher,
  						    is_list(Password) andalso
  						    is_list(Cipher) ->
     do_pem_entry_encode(Asn1Type, Entity, CipherInfo, Password);
-pem_entry_encode(Asn1Type, Entity, {{Cipher, Salt} = CipherInfo, 
+pem_entry_encode(Asn1Type, Entity, {{Cipher, Salt} = CipherInfo,
 				    Password}) when is_atom(Asn1Type) andalso
 						    is_list(Password) andalso
 						    is_list(Cipher) andalso
@@ -321,7 +321,7 @@ pem_entry_encode(Asn1Type, Entity, {{Cipher, Salt} = CipherInfo,
 						    ((erlang:byte_size(Salt) == 8) or
 						     (erlang:byte_size(Salt) == 16)) ->
     do_pem_entry_encode(Asn1Type, Entity, CipherInfo, Password).
-    
+
 %%--------------------------------------------------------------------
 -spec der_decode(Asn1Type, Der) -> Entity when Asn1Type :: asn1_type(),
                                                Der :: der_encoded(),
@@ -342,10 +342,10 @@ der_decode(Asn1Type, Der) when (((Asn1Type == 'PrivateKeyInfo')
     end;
 
 der_decode(Asn1Type, Der) when is_atom(Asn1Type), is_binary(Der) ->
-    try 
+    try
 	{ok, Decoded} = 'OTP-PUB-KEY':decode(Asn1Type, Der),
 	Decoded
-    catch	    
+    catch
 	error:{badmatch, {error, _}} = Error ->
 	    erlang:error(Error)
     end.
@@ -390,7 +390,7 @@ der_priv_key_decode({'PrivateKeyInfo', v1,
 	{'PrivateKeyInfo_privateKeyAlgorithm', ?'rsaEncryption', _}, PrivKey, _}) ->
 	der_decode('RSAPrivateKey', PrivKey);
 der_priv_key_decode({'PrivateKeyInfo', v1,
-                     {'PrivateKeyInfo_privateKeyAlgorithm', ?'id-RSASSA-PSS', 
+                     {'PrivateKeyInfo_privateKeyAlgorithm', ?'id-RSASSA-PSS',
                       {asn1_OPENTYPE, Parameters}}, PrivKey, _}) ->
     Key = der_decode('RSAPrivateKey', PrivKey),
     Params = der_decode('RSASSA-PSS-params', Parameters),
@@ -495,10 +495,10 @@ der_encode(Asn1Type, Entity) when (Asn1Type == 'PrivateKeyInfo') orelse
              erlang:error(Error)
      end;
 der_encode(Asn1Type, Entity) when is_atom(Asn1Type) ->
-    try 
+    try
 	{ok, Encoded} = 'OTP-PUB-KEY':encode(Asn1Type, Entity),
 	Encoded
-    catch	    
+    catch
 	error:{badmatch, {error, _}} = Error ->
 	    erlang:error(Error)
     end.
@@ -517,8 +517,8 @@ der_encode(Asn1Type, Entity) when is_atom(Asn1Type) ->
 pkix_decode_cert(DerCert, plain)  when is_binary(DerCert) ->
     der_decode('Certificate', DerCert);
 pkix_decode_cert(DerCert, otp) when is_binary(DerCert) ->
-    try 
-	{ok, #'OTPCertificate'{}= Cert} = 
+    try
+	{ok, #'OTPCertificate'{}= Cert} =
 	    pubkey_cert_records:decode_cert(DerCert),
 	Cert
     catch
@@ -536,7 +536,7 @@ pkix_decode_cert(DerCert, otp) when is_binary(DerCert) ->
 %% Description: Der encodes a certificate or part of a certificate.
 %% This function must be used for encoding certificates or parts of certificates
 %% that are decoded with the otp format, whereas for the plain format this
-%% function will only call der_encode/2.   
+%% function will only call der_encode/2.
 %%--------------------------------------------------------------------
 pkix_encode(Asn1Type, Term, plain) when is_atom(Asn1Type) ->
     der_encode(Asn1Type, Term);
@@ -585,7 +585,7 @@ decrypt_public(CipherText, Key) ->
                                      Key :: rsa_public_key(),
                                      Options :: crypto:pk_encrypt_decrypt_opts(),
                                      PlainText :: binary() .
-decrypt_public(CipherText, #'RSAPublicKey'{modulus = N, publicExponent = E}, 
+decrypt_public(CipherText, #'RSAPublicKey'{modulus = N, publicExponent = E},
 	       Options) when is_binary(CipherText), is_list(Options)  ->
     crypto:public_decrypt(rsa, CipherText,[E, N], default_options(Options)).
 
@@ -607,7 +607,7 @@ encrypt_public(PlainText, Key) ->
                                        Key :: rsa_public_key(),
                                        Options :: crypto:pk_encrypt_decrypt_opts(),
                                        CipherText :: binary() .
-encrypt_public(PlainText, #'RSAPublicKey'{modulus=N,publicExponent=E}, 
+encrypt_public(PlainText, #'RSAPublicKey'{modulus=N,publicExponent=E},
 	       Options) when is_binary(PlainText), is_list(Options) ->
     crypto:public_encrypt(rsa, PlainText, [E,N], default_options(Options)).
 
@@ -716,7 +716,7 @@ generate_key({rsa, ModulusSize, PublicExponent}) ->
                               exponent1 = '?',
                               exponent2 = '?',
                               coefficient = '?'};
-        
+
         Other ->
             Other
     end.
@@ -724,7 +724,7 @@ generate_key({rsa, ModulusSize, PublicExponent}) ->
 %%--------------------------------------------------------------------
 %% Description: Compute shared secret
 %%--------------------------------------------------------------------
--spec compute_key(OthersECDHkey, MyECDHkey) -> 
+-spec compute_key(OthersECDHkey, MyECDHkey) ->
                          SharedSecret
                              when OthersECDHkey :: #'ECPoint'{},
                                   MyECDHkey :: #'ECPrivateKey'{},
@@ -740,7 +740,7 @@ compute_key(#'ECPoint'{point = Point}, #'ECPrivateKey'{privateKey = PrivKey,
     ECCurve = ec_curve_spec(Param),
     crypto:compute_key(ecdh, Point, PrivKey, ECCurve).
 
--spec compute_key(OthersDHkey, MyDHkey, DHparms) -> 
+-spec compute_key(OthersDHkey, MyDHkey, DHparms) ->
                          SharedSecret
                              when OthersDHkey :: crypto:dh_public(), % Was: binary(),
                                   MyDHkey :: crypto:dh_private(), % Was: binary(),
@@ -750,7 +750,7 @@ compute_key(PubKey, PrivKey, #'DHParameter'{prime = P, base = G}) ->
     crypto:compute_key(dh, PubKey, PrivKey, [P, G]).
 
 %%--------------------------------------------------------------------
--spec pkix_sign_types(AlgorithmId) -> 
+-spec pkix_sign_types(AlgorithmId) ->
                              {DigestType, SignatureType}
                                  when AlgorithmId :: oid(),
                                       %% Relevant dsa digest type is a subset of rsa_digest_type()
@@ -795,7 +795,7 @@ pkix_sign_types(?'id-Ed448') ->
 
 %%--------------------------------------------------------------------
 -spec pkix_hash_type(HashOid::oid()) -> DigestType:: md5 | crypto:sha1() | crypto:sha2().
-          
+
 pkix_hash_type(?'id-sha1') ->
     sha;
 pkix_hash_type(?'id-sha512') ->
@@ -892,10 +892,10 @@ pkix_dist_point(OtpCert) ->
     Issuer = public_key:pkix_normalize_name(
 	       pubkey_cert_records:transform(
 		 OtpCert#'OTPCertificate'.tbsCertificate#'OTPTBSCertificate'.issuer, encode)),
-    
+
     TBSCert = OtpCert#'OTPCertificate'.tbsCertificate,
     Extensions = pubkey_cert:extensions_list(TBSCert#'OTPTBSCertificate'.extensions),
-    AltNames = case pubkey_cert:select_extension(?'id-ce-issuerAltName', Extensions) of 
+    AltNames = case pubkey_cert:select_extension(?'id-ce-issuerAltName', Extensions) of
 		   undefined ->
 		       [];
 		   #'Extension'{extnValue = Value} ->
@@ -904,7 +904,7 @@ pkix_dist_point(OtpCert) ->
     Point = {fullName, [{directoryName, Issuer} | AltNames]},
     #'DistributionPoint'{cRLIssuer = asn1_NOVALUE,
 			 reasons = asn1_NOVALUE,
-			 distributionPoint =  Point}.	
+			 distributionPoint =  Point}.
 %%--------------------------------------------------------------------
 -spec pkix_dist_points(Cert) -> DistPoints when Cert :: cert(),
                                                 DistPoints :: [ #'DistributionPoint'{} ].
@@ -917,7 +917,7 @@ pkix_dist_points(OtpCert) ->
     lists:foldl(fun(Point, Acc0) ->
 			DistPoint = pubkey_cert_records:transform(Point, decode),
 			[DistPoint | Acc0]
-		end, 
+		end,
 		[], Value).
 
 %%--------------------------------------------------------------------
@@ -955,15 +955,15 @@ pkix_match_dist_point(#'CertificateList'{
     end.
 
 %%--------------------------------------------------------------------
--spec pkix_sign(Cert, Key) -> Der when Cert :: #'OTPTBSCertificate'{}, 
+-spec pkix_sign(Cert, Key) -> Der when Cert :: #'OTPTBSCertificate'{},
                                        Key :: private_key(),
                                        Der :: der_encoded() .
 %%
 %% Description: Sign a pkix x.509 certificate. Returns the corresponding
 %% der encoded 'Certificate'{}
 %%--------------------------------------------------------------------
-pkix_sign(#'OTPTBSCertificate'{signature = 
-				   #'SignatureAlgorithm'{} 
+pkix_sign(#'OTPTBSCertificate'{signature =
+				   #'SignatureAlgorithm'{}
 			       = SigAlg} = TBSCert, Key) ->
     Msg = pkix_encode('OTPTBSCertificate', TBSCert, otp),
     {DigestType, _, Opts} = pubkey_cert:x509_pkix_sign_types(SigAlg),
@@ -980,17 +980,17 @@ pkix_sign(#'OTPTBSCertificate'{signature =
 %%
 %% Description: Verify pkix x.509 certificate signature.
 %%--------------------------------------------------------------------
-pkix_verify(DerCert, {Key, #'Dss-Parms'{}} = DSAKey) 
+pkix_verify(DerCert, {Key, #'Dss-Parms'{}} = DSAKey)
   when is_binary(DerCert), is_integer(Key) ->
     {DigestType, PlainText, Signature} = pubkey_cert:verify_data(DerCert),
     verify(PlainText, DigestType, Signature, DSAKey);
 
-pkix_verify(DerCert,  #'RSAPublicKey'{} = RSAKey) 
+pkix_verify(DerCert,  #'RSAPublicKey'{} = RSAKey)
   when is_binary(DerCert) ->
     {DigestType, PlainText, Signature} = pubkey_cert:verify_data(DerCert),
     verify(PlainText, DigestType, Signature, RSAKey);
 
-pkix_verify(DerCert,  {#'RSAPublicKey'{} = RSAKey, #'RSASSA-PSS-params'{} = Params}) 
+pkix_verify(DerCert,  {#'RSAPublicKey'{} = RSAKey, #'RSASSA-PSS-params'{} = Params})
   when is_binary(DerCert) ->
     {DigestType, PlainText, Signature} = pubkey_cert:verify_data(DerCert),
     verify(PlainText, DigestType, Signature, RSAKey, rsa_opts(Params));
@@ -1023,13 +1023,13 @@ pkix_crl_verify(CRL, Cert) when is_binary(CRL) ->
 pkix_crl_verify(CRL, Cert) when is_binary(Cert) ->
     pkix_crl_verify(CRL, pkix_decode_cert(Cert, otp));
 pkix_crl_verify(#'CertificateList'{} = CRL, #'OTPCertificate'{} = Cert) ->
-    TBSCert = Cert#'OTPCertificate'.tbsCertificate, 
+    TBSCert = Cert#'OTPCertificate'.tbsCertificate,
     PublicKeyInfo = TBSCert#'OTPTBSCertificate'.subjectPublicKeyInfo,
     PublicKey = PublicKeyInfo#'OTPSubjectPublicKeyInfo'.subjectPublicKey,
     AlgInfo = PublicKeyInfo#'OTPSubjectPublicKeyInfo'.algorithm,
     PublicKeyParams = AlgInfo#'PublicKeyAlgorithm'.parameters,
-    pubkey_crl:verify_crl_signature(CRL, 
-				    der_encode('CertificateList', CRL), 
+    pubkey_crl:verify_crl_signature(CRL,
+				    der_encode('CertificateList', CRL),
 				    PublicKey, PublicKeyParams).
 
 %%--------------------------------------------------------------------
@@ -1045,7 +1045,7 @@ pkix_is_issuer(Cert, IssuerCert)  when is_binary(Cert) ->
 pkix_is_issuer(Cert, IssuerCert) when is_binary(IssuerCert) ->
     OtpIssuerCert = pkix_decode_cert(IssuerCert, otp),
     pkix_is_issuer(Cert, OtpIssuerCert);
-pkix_is_issuer(#'OTPCertificate'{tbsCertificate = TBSCert}, 
+pkix_is_issuer(#'OTPCertificate'{tbsCertificate = TBSCert},
 	       #'OTPCertificate'{tbsCertificate = Candidate}) ->
     pubkey_cert:is_issuer(TBSCert#'OTPTBSCertificate'.issuer,
 			  Candidate#'OTPTBSCertificate'.subject);
@@ -1057,14 +1057,14 @@ pkix_is_issuer(#'CertificateList'{tbsCertList = TBSCRL},
 %%--------------------------------------------------------------------
 -spec pkix_is_self_signed(Cert) -> boolean() when Cert::cert().
 %%
-%% Description: Checks if a Certificate is self signed. 
+%% Description: Checks if a Certificate is self signed.
 %%--------------------------------------------------------------------
 pkix_is_self_signed(#'OTPCertificate'{} = OTPCert) ->
     pubkey_cert:is_self_signed(OTPCert);
 pkix_is_self_signed(Cert) when is_binary(Cert) ->
     OtpCert = pkix_decode_cert(Cert, otp),
     pkix_is_self_signed(OtpCert).
-  
+
 %%--------------------------------------------------------------------
 -spec pkix_is_fixed_dh_cert(Cert) -> boolean() when Cert::cert().
 %%
@@ -1085,10 +1085,10 @@ pkix_is_fixed_dh_cert(Cert) when is_binary(Cert) ->
 
 %% Description: Returns the issuer id.
 %%--------------------------------------------------------------------
-pkix_issuer_id(#'OTPCertificate'{} = OtpCert, Signed) when (Signed == self) or 
+pkix_issuer_id(#'OTPCertificate'{} = OtpCert, Signed) when (Signed == self) or
 							   (Signed == other) ->
     pubkey_cert:issuer_id(OtpCert, Signed);
-pkix_issuer_id(Cert, Signed) when is_binary(Cert) -> 
+pkix_issuer_id(Cert, Signed) when is_binary(Cert) ->
     OtpCert = pkix_decode_cert(Cert, otp),
     pkix_issuer_id(OtpCert, Signed).
 
@@ -1101,7 +1101,7 @@ pkix_issuer_id(Cert, Signed) when is_binary(Cert) ->
 %%--------------------------------------------------------------------
 pkix_subject_id(#'OTPCertificate'{} = OtpCert) ->
     pubkey_cert:subject_id(OtpCert);
-pkix_subject_id(Cert) when is_binary(Cert) -> 
+pkix_subject_id(Cert) when is_binary(Cert) ->
     OtpCert = pkix_decode_cert(Cert, otp),
     pkix_subject_id(OtpCert).
 
@@ -1118,21 +1118,21 @@ pkix_crl_issuer(#'CertificateList'{} = CRL) ->
       CRL#'CertificateList'.tbsCertList#'TBSCertList'.issuer, decode).
 
 %%--------------------------------------------------------------------
--spec pkix_normalize_name(Issuer) -> Normalized 
+-spec pkix_normalize_name(Issuer) -> Normalized
                                          when Issuer :: issuer_name() | der_encoded(),
                                               Normalized :: issuer_name() .
 %%
 %% Description: Normalizes a issuer name so that it can be easily
-%%              compared to another issuer name. 
+%%              compared to another issuer name.
 %%--------------------------------------------------------------------
-pkix_normalize_name(Issuer) when is_binary(Issuer) -> 
+pkix_normalize_name(Issuer) when is_binary(Issuer) ->
     PlainGenName = der_decode('Name', Issuer),
     GenName = pubkey_cert_records:transform(PlainGenName, decode),
     pkix_normalize_name(GenName);
-pkix_normalize_name(Issuer) -> 
+pkix_normalize_name(Issuer) ->
     pubkey_cert:normalize_general_name(Issuer).
 
-%%-------------------------------------------------------------------- 
+%%--------------------------------------------------------------------
 -spec pkix_path_validation(Cert, CertChain, Options) ->
           {ok, {PublicKeyInfo, PolicyTree}} |
           {error, {bad_cert, Reason :: bad_cert_reason()}}
@@ -1156,10 +1156,10 @@ pkix_path_validation(#'OTPCertificate'{} = TrustedCert, CertChain, Options)
     {VerifyFun, UserState0} =
 	proplists:get_value(verify_fun, Options, ?DEFAULT_VERIFYFUN),
     try pubkey_cert:validate_time(TrustedCert, UserState0, VerifyFun) of
-        UserState1 -> 
-            ValidationState = pubkey_cert:init_validation_state(TrustedCert, 
-                                                                MaxPathDefault, 
-                                                                [{verify_fun, {VerifyFun, UserState1}} | 
+        UserState1 ->
+            ValidationState = pubkey_cert:init_validation_state(TrustedCert,
+                                                                MaxPathDefault,
+                                                                [{verify_fun, {VerifyFun, UserState1}} |
                                                                  proplists:delete(verify_fun, Options)]),
             case exists_duplicate_cert(CertChain) of
                 true ->
@@ -1274,7 +1274,7 @@ pkix_verify_hostname(Cert = #'OTPCertificate'{tbsCertificate = TbsCert}, Referen
 		    verify_hostname_match_loop(verify_hostname_fqnds(ReferenceIDs, FqdnFun),
 					       PresentedCNs,
 					       MatchFun, FailCB, Cert);
-		
+
 		_ ->
 		    false
 	    end;
@@ -1366,9 +1366,9 @@ pkix_test_data(#{} = Chain) ->
 
 pkix_test_root_cert(Name, Opts) ->
     pubkey_cert:root_cert(Name, Opts).
-      
+
 %%--------------------------------------------------------------------
--spec pkix_ocsp_validate(Cert, IssuerCert, OcspRespDer, 
+-spec pkix_ocsp_validate(Cert, IssuerCert, OcspRespDer,
                          ResponderCerts, NonceExt) -> valid | {bad_cert, Reason}
               when Cert:: cert(),
                    IssuerCert:: cert(),
@@ -1539,8 +1539,8 @@ format_verify_key(#'DSAPrivateKey'{y=Y, p=P, q=Q, g=G}) ->
 format_verify_key(_) ->
     badarg.
 
-rsa_opts(#'RSASSA-PSS-params'{saltLength = SaltLen, 
-                              maskGenAlgorithm = 
+rsa_opts(#'RSASSA-PSS-params'{saltLength = SaltLen,
+                              maskGenAlgorithm =
                                   #'MaskGenAlgorithm'{algorithm = ?'id-mgf1',
                                                       parameters = #'HashAlgorithm'{algorithm = HashAlgoOid}
                                                      }}) ->
@@ -1553,7 +1553,7 @@ do_pem_entry_encode(Asn1Type, Entity, CipherInfo, Password) ->
     Der = der_encode(Asn1Type, Entity),
     DecryptDer = pubkey_pem:cipher(Der, CipherInfo, Password),
     {Asn1Type, DecryptDer, CipherInfo}.
-  
+
 do_pem_entry_decode({Asn1Type,_, _} = PemEntry, Password) ->
     Der = pubkey_pem:decipher(PemEntry, Password),
     der_decode(Asn1Type, Der).
@@ -1576,7 +1576,7 @@ path_validation([], #path_validation_state{working_public_key_algorithm
 					   = Algorithm,
 					   working_public_key =
 					   PublicKey,
-					   working_public_key_parameters 
+					   working_public_key_parameters
 					   = PublicKeyParams,
 					   valid_policy_tree = Tree
 					  }) ->
@@ -1588,7 +1588,7 @@ path_validation([DerCert | Rest], ValidationState = #path_validation_state{
 		 ValidationState#path_validation_state{last_cert=Rest=:=[]}) of
 	#path_validation_state{} = NewValidationState ->
 	    path_validation(Rest, NewValidationState)
-    catch   
+    catch
 	throw:Reason ->
 	    {error, Reason}
     end;
@@ -1615,15 +1615,15 @@ path_validation([Cert | _] = Path,
 
 validate(Cert, #path_validation_state{working_issuer_name = Issuer,
                                       working_public_key = Key,
-                                      working_public_key_parameters = 
-                                          KeyParams, 
+                                      working_public_key_parameters =
+                                          KeyParams,
                                       permitted_subtrees = Permit,
                                       excluded_subtrees = Exclude,
                                       last_cert = Last,
                                       user_state = UserState0,
                                       verify_fun = VerifyFun} =
 	     ValidationState0) ->
-    
+
     OtpCert = otp_cert(Cert),
 
     {ValidationState1, UserState1} =
@@ -1651,7 +1651,7 @@ validate(Cert, #path_validation_state{working_issuer_name = Issuer,
 					       UserState5, VerifyFun)
 		end,
 
-    ValidationState  = 
+    ValidationState  =
 	ValidationState1#path_validation_state{user_state = UserState},
 
     pubkey_cert:prepare_for_next_cert(OtpCert, ValidationState).
@@ -1858,7 +1858,7 @@ field_param_decode(?'tpBasis', Params) ->
     {tpbasis, K};
 field_param_decode(?'gnBasis', _) ->
     onbasis.
-        
+
 -spec ec_key({PubKey::term(), PrivateKey::term()}, Params::ecpk_parameters()) -> #'ECPrivateKey'{}.
 ec_key({PubKey, PrivateKey}, Params) ->
     #'ECPrivateKey'{version = 1,
@@ -1967,9 +1967,9 @@ verify_hostname_fqnds(L, FqdnFun) ->
 verify_hostname_match_default(Ref, Pres) ->
     verify_hostname_match_default0(to_lower_ascii(Ref), to_lower_ascii(Pres)).
 
-verify_hostname_match_default0(FQDN=[_|_], {cn,FQDN}) -> 
+verify_hostname_match_default0(FQDN=[_|_], {cn,FQDN}) ->
     not lists:member($*, FQDN);
-verify_hostname_match_default0(FQDN=[_|_], {cn,Name=[_|_]}) -> 
+verify_hostname_match_default0(FQDN=[_|_], {cn,Name=[_|_]}) ->
     verify_hostname_match_wildcard(FQDN, Name);
 verify_hostname_match_default0({dns_id,R}, {dNSName,P}) ->
     R==P;
@@ -2018,7 +2018,7 @@ l16_to_tup(L) -> list_to_tuple(l16_to_tup(L, [])).
 %%
 l16_to_tup([A,B|T], Acc) -> l16_to_tup(T, [(A bsl 8) bor B | Acc]);
 l16_to_tup([], Acc) -> lists:reverse(Acc).
-    
+
 match_wild(A,     [$*|B]) -> match_wild_suffixes(A, B);
 match_wild([C|A], [ C|B]) -> match_wild(A, B);
 match_wild([],        []) -> true;
@@ -2032,7 +2032,7 @@ match_wild_sfx(_,      [$*|_]) -> false; % Bad pattern (no more wildcards allowe
 match_wild_sfx([A|Ar], [A|Br]) -> match_wild_sfx(Ar, Br);
 match_wild_sfx(Ar,         []) -> not lists:member($*, Ar); % Chk for bad name (= wildcards)
 match_wild_sfx(_,           _) -> false.
-    
+
 
 verify_hostname_match_loop(Refs0, Pres0, undefined, FailCB, Cert) ->
     Pres = lists:map(fun to_lower_ascii/1, Pres0),
